@@ -1,0 +1,105 @@
+#!/bin/bash
+# Генерируем необходимые сертификаты для VPN.
+SECONDS=0
+printf "\033c"
+echo "Выписываем сертификаты..."
+echo
+echo "Enter the \"company\" "
+read company
+echo "Enter the \"email\" "
+read email
+echo "Enter the \"tun\" "
+read tun
+sed -i '64s/US/RU/' /etc/openvpn/easy-rsa/vars
+sed -i '65s/CA/MSK/' /etc/openvpn/easy-rsa/vars
+sed -i '66s/SanFrancisco/Moscow/' /etc/openvpn/easy-rsa/vars
+sed -i "67s/Fort-Funston/${company}/" /etc/openvpn/easy-rsa/vars
+sed -i "68s/me@myhost.mydomain/${email}/" /etc/openvpn/easy-rsa/vars
+sed -i '69s/MyOrganizationalUnit/IT/' /etc/openvpn/easy-rsa/vars
+echo
+#получение имени сетевого интерфейса (eth0, ens32, eno1 и т.д.)
+net=`ip r | grep default | grep -Po '(?<=dev )(\S+)'`
+#получение ip-адреса сетевого интерфейса $net
+vdsip=`ip addr show $net | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}'`
+EASYRSAPATH=/etc/openvpn/easy-rsa
+KEYSPATH=/etc/openvpn/easy-rsa/keys
+cd $EASYRSAPATH
+source vars
+./clean-all
+echo
+echo "******************************************"
+echo "***** Генерация корневого сертификата *****"
+echo "******************************************"
+echo
+echo -en "\n\n\n\n\n\n\n\n" | ./build-ca
+echo
+echo "********************************************"
+echo "***** Генерация серверного сертификата *****"
+echo "********************************************"
+echo
+(echo -en "\n\n\n\n\n\n\n\n"; sleep 1; echo -en "\n"; sleep 1; echo -en "\n"; sleep 3; echo -en "y"; echo -en "\n"; sleep 3; echo -en "y"; echo -en "\n") | ./build-key-server $company-server
+echo
+echo "***************************************************"
+echo "***** Генерация пользовательского сертификата *****"
+echo "***************************************************"
+echo
+(echo -en "\n\n\n\n\n\n\n\n"; sleep 1; echo -en "\n"; sleep 1; echo -en "\n"; sleep 3; echo -en "y"; echo -en "\n"; sleep 3; echo -en "y"; echo -en "\n") | ./build-key $company-user
+echo
+echo "************************************************************************"
+echo "***** Генерация ключа Диффи-Хэлмана и ключа для TLS-аутентификации *****"
+echo "************************************************************************"
+echo
+./build-dh
+openvpn --genkey --secret keys/$company-ta.key
+mv /etc/openvpn/easy-rsa/keys/ca.crt /etc/openvpn/easy-rsa/keys/$company-ca.crt
+mkdir /etc/openvpn/user
+cd $KEYSPATH
+cp *server.crt *server.key *ca.crt dh2048.pem *ta.key /etc/openvpn
+cp *user.crt *user.key *ca.crt *ta.key /etc/openvpn/user
+# ****Генерация /ccd и server.conf********************************
+mkdir /etc/openvpn/ccd
+touch /etc/openvpn/ccd/$company-user
+#указываем СВОИ подсети (строка 63, 66)
+echo -en "ifconfig-push 10.1.$tun.4 10.1.$tun.1\niroute 192.168.102.0 255.255.255.0\niroute 192.168.10.0 255.255.255.0\niroute 192.168.2.0 255.255.255.0\n" >> /etc/openvpn/ccd/$company-user
+touch /etc/openvpn/server.conf
+echo -en "port 1194\nproto tcp\ndev tun0\nca $company-ca.crt\ncert $company-server.crt\nkey $company-server.key\ndh dh2048.pem\nserver 10.1.$tun.0 255.255.255.0\nclient-config-dir ccd\n" >> /etc/openvpn/server.conf
+echo -en "route 10.1.$tun.0 255.255.255.0\nroute 192.168.102.0 255.255.255.0 10.1.$tun.2\nroute 192.168.10.0 255.255.255.0 10.1.$tun.2\nroute 192.168.2.0 255.255.255.0 10.1.$tun.2\n" >> /etc/openvpn/server.conf
+echo -en "push \042redirect-gateway def1\042\nkeepalive 10 120\ntls-auth $company-ta.key 0\ncipher DES-EDE3-CBC\ncomp-lzo\npersist-key\npersist-tun\nstatus openvpn-status.log\nlog /var/log/openvpn.log\nverb 3\n" >> /etc/openvpn/server.conf
+# ****************************************************************
+# ****Генерация rc.local и iptables.rules ************************
+rm /etc/rc.local
+touch /etc/rc.local
+chmod 755 /etc/rc.local
+echo -en "#!/bin/sh -e\niptables-restore < /etc/iptables.rules\nexit 0\n" >> /etc/rc.local
+touch /etc/iptables.rules
+echo -en "*mangle\n:PREROUTING ACCEPT [44213:4111894]\n:INPUT ACCEPT [22109:2121408]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [222:25744]\n:POSTROUTING ACCEPT [222:25744]\nCOMMIT\n" >> /etc/iptables.rules
+echo -en "*filter\n:INPUT DROP [21121:2005015]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [222:25744]\n" >> /etc/iptables.rules
+echo -en "-A INPUT -i tun0 -j ACCEPT\n-A INPUT -i lo -j ACCEPT\n-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "-A INPUT -p tcp -m tcp --dport 1194 -j ACCEPT\n-A INPUT -s 192.168.10.0/24 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 192.168.2.0/24 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "-A INPUT -s 185.45.152.174/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 178.16.26.122/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 176.9.145.115/32 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "-A INPUT -s 5.9.108.25/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 89.249.23.194/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 195.122.19.17/32 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "-A INPUT -s 195.122.19.18/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 195.122.19.19/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 195.122.19.9/32 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "-A INPUT -s 195.122.19.10/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 195.122.19.11/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 91.228.238.172/32 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "-A INPUT -s 185.45.152.128/28 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 185.45.152.160/27 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 192.168.10.0/24 -p udp -m udp --dport 4569 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "-A INPUT -s 192.168.2.0/24 -p udp -m udp --dport 4569 -j ACCEPT\n-A INPUT -p udp -m udp --dport 10000:20000 -j ACCEPT\n-A INPUT -p icmp -m icmp --icmp-type 0 -j ACCEPT\n-A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "COMMIT\n##############\n*nat\n:PREROUTING ACCEPT [8279:852947]\n:OUTPUT ACCEPT [0:0]\n:POSTROUTING ACCEPT [0:0]\n" >> /etc/iptables.rules
+echo -en "-A POSTROUTING -o $net -j SNAT --to-source $vdsip\nCOMMIT\n*raw\n:PREROUTING ACCEPT [44288:4119009]\n:OUTPUT ACCEPT [222:25744]\nCOMMIT\n" >> /etc/iptables.rules
+# ****************************************************************
+# ****Генерация клиентских конфигов ******************************
+touch /etc/openvpn/user/$company-openvpn.log #должен быть пустой
+touch /etc/openvpn/user/$company-user.ovpn
+echo -en "client\ndev tun$tun\nproto tcp\nremote $vdsip 1194\nresolv-retry infinite\nnobind\npersist-key\npersist-tun\n" >> /etc/openvpn/user/$company-user.ovpn
+echo -en "ca $company-ca.crt\ncert $company-user.crt\nkey $company-user.key\ntls-auth $company-ta.key 1\ncipher DES-EDE3-CBC\n" >> /etc/openvpn/user/$company-user.ovpn
+echo -en "ns-cert-type server\ncomp-lzo\nlog $company-openvpn.log\nverb 3\nscript-security 2\nup \042/etc/openvpn/$company-up.sh\042\n" >> /etc/openvpn/user/$company-user.ovpn
+touch /etc/openvpn/user/$company-up.sh
+echo -en "#!/bin/bash\n/sbin/ip route add default via 10.1.$tun.1 dev tun$tun table $company\n" >> /etc/openvpn/user/$company-up.sh
+echo -en "#/sbin/ip rule add from 192.168.x.x table $company #KB\n#/sbin/ip rule add from 192.168.x.x table $company #TXM\n" >> /etc/openvpn/user/$company-up.sh
+echo -en "/sbin/ip route flush cache\n" >> /etc/openvpn/user/$company-up.sh
+ln -s /etc/openvpn/user/$company-user.ovpn /etc/openvpn/user/$company-user.conf
+tar -cvf /etc/openvpn/user/$company.tar /etc/openvpn/user/*
+echo
+echo "Клиентские сертификаты и конфиги сгенерированы (8 файлов). Их нужно скопировать из /etc/openvpn/user на шлюз."
+# ****************************************************************
+echo
+echo "***** Script 3/3 COMPLETED in $SECONDS seconds *****"
+echo

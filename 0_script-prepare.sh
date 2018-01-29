@@ -20,10 +20,10 @@ echo -en "Subsystem sftp /usr/lib/openssh/sftp-server\nUsePAM yes\n" >> /etc/ssh
 chmod 644 /etc/ssh/sshd_config
 #service ssh restart
 #service sshd restart
-wget https://raw.githubusercontent.com/Krushon/script/master/1_script-upgrade.sh
-wget https://raw.githubusercontent.com/Krushon/script/master/2_script-install.sh
-wget https://raw.githubusercontent.com/Krushon/script/master/3_script-cert.sh
-wget https://raw.githubusercontent.com/Krushon/script/master/script-delete.sh
+wget https://raw.githubusercontent.com/Krushon/vds-script/master/1_script-upgrade.sh
+wget https://raw.githubusercontent.com/Krushon/vds-script/master/2_script-install.sh
+wget https://raw.githubusercontent.com/Krushon/vds-script/master/3_script-cert.sh
+wget https://raw.githubusercontent.com/Krushon/vds-script/master/script-delete.sh
 chmod +x 1_script-upgrade.sh 2_script-install.sh 3_script-cert.sh script-delete.sh
 echo
 echo "***** Script COMPLETED in $SECONDS seconds *****"

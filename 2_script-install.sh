@@ -10,6 +10,9 @@ apt-get clean
 /etc/init.d/ntp stop
 ntpdate pool.ntp.org
 /etc/init.d/ntp start
+# Изменяем временную зону
+ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
+# Готовимся к генерации сертификатов
 mkdir /etc/openvpn/easy-rsa
 cp -r /usr/share/easy-rsa/* /etc/openvpn/easy-rsa
 ln -s /etc/openvpn/easy-rsa/openssl-1.0.0.cnf /etc/openvpn/easy-rsa/openssl.cnf

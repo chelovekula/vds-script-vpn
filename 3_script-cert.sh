@@ -60,10 +60,10 @@ cp *user.crt *user.key *ca.crt *ta.key /etc/openvpn/user
 mkdir /etc/openvpn/ccd
 touch /etc/openvpn/ccd/$company-user
 #указываем СВОИ подсети (строка 63, 66)
-echo -en "ifconfig-push 10.1.$tun.4 10.1.$tun.1\niroute 192.168.102.0 255.255.255.0\niroute 192.168.10.0 255.255.255.0\niroute 192.168.2.0 255.255.255.0\n" >> /etc/openvpn/ccd/$company-user
+echo -en "ifconfig-push 10.1.$tun.4 10.1.$tun.1\niroute 10.1.1.0 255.255.255.0\niroute 192.168.102.0 255.255.255.0\niroute 192.168.10.0 255.255.255.0\niroute 192.168.2.0 255.255.255.0\n" >> /etc/openvpn/ccd/$company-user
 touch /etc/openvpn/server.conf
 echo -en "port 1194\nproto tcp\ndev tun0\nca $company-ca.crt\ncert $company-server.crt\nkey $company-server.key\ndh dh2048.pem\nserver 10.1.$tun.0 255.255.255.0\nclient-config-dir ccd\n" >> /etc/openvpn/server.conf
-echo -en "route 10.1.$tun.0 255.255.255.0\nroute 192.168.102.0 255.255.255.0 10.1.$tun.2\nroute 192.168.10.0 255.255.255.0 10.1.$tun.2\nroute 192.168.2.0 255.255.255.0 10.1.$tun.2\n" >> /etc/openvpn/server.conf
+echo -en "route 10.1.1.0 255.255.255.0\nroute 10.1.$tun.0 255.255.255.0\nroute 192.168.102.0 255.255.255.0 10.1.$tun.2\nroute 192.168.10.0 255.255.255.0 10.1.$tun.2\nroute 192.168.2.0 255.255.255.0 10.1.$tun.2\n" >> /etc/openvpn/server.conf
 echo -en "push \042redirect-gateway def1\042\nkeepalive 10 120\ntls-auth $company-ta.key 0\ncipher DES-EDE3-CBC\ncomp-lzo\npersist-key\npersist-tun\nstatus openvpn-status.log\nlog /var/log/openvpn.log\nverb 3\n" >> /etc/openvpn/server.conf
 # ****************************************************************
 # ****Генерация rc.local и iptables.rules ************************

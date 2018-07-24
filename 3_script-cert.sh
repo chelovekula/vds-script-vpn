@@ -23,6 +23,7 @@ net=`ip r | grep default | grep -Po '(?<=dev )(\S+)'`
 vdsip=`ip addr show $net | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}'`
 EASYRSAPATH=/etc/openvpn/easy-rsa
 KEYSPATH=/etc/openvpn/easy-rsa/keys
+CAUSERPATH=/etc/openvpn/user/
 cd $EASYRSAPATH
 source vars
 ./clean-all
@@ -92,11 +93,12 @@ echo -en "client\ndev tun$tun\nproto tcp\nremote $vdsip 1194\nresolv-retry infin
 echo -en "ca $company-ca.crt\ncert $company-user.crt\nkey $company-user.key\ntls-auth $company-ta.key 1\ncipher DES-EDE3-CBC\n" >> /etc/openvpn/user/$company-user.ovpn
 echo -en "ns-cert-type server\ncomp-lzo\nlog $company-openvpn.log\nverb 3\nscript-security 2\nup \042/etc/openvpn/$company-up.sh\042\n" >> /etc/openvpn/user/$company-user.ovpn
 touch /etc/openvpn/user/$company-up.sh
-echo -en "#!/bin/bash\n/sbin/ip route add default via 10.1.$tun.1 dev tun$tun table $company\n" >> /etc/openvpn/user/$company-up.sh
-echo -en "#/sbin/ip rule add from 192.168.x.x table $company #KB\n#/sbin/ip rule add from 192.168.x.x table $company #TXM\n" >> /etc/openvpn/user/$company-up.sh
+echo -en "#!/bin/bash\n/sbin/ip route/etc/openvpn/user/ add default via 10.1.$tun.1 dev tun$tun table $company\n" >> /etc/openvpn/user/$company-up.sh
+echo -en "#/sbin/ip rule add from 10.1.1.x table $company #KB\n#/sbin/ip rule add from 192.168.x.x table $company #TXM\n" >> /etc/openvpn/user/$company-up.sh
 echo -en "/sbin/ip route flush cache\n" >> /etc/openvpn/user/$company-up.sh
 ln -s /etc/openvpn/user/$company-user.ovpn /etc/openvpn/user/$company-user.conf
-tar -cvf /etc/openvpn/user/$company.tar /etc/openvpn/user/*
+cd $CAUSERPATH
+tar -cvf $company.tar *
 echo
 echo "Клиентские сертификаты и конфиги сгенерированы (8 файлов). Их нужно скопировать из /etc/openvpn/user на шлюз."
 # ****************************************************************

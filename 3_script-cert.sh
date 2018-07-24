@@ -98,7 +98,7 @@ echo -en "#/sbin/ip rule add from 10.1.1.x table $company #KB\n#/sbin/ip rule ad
 echo -en "/sbin/ip route flush cache\n" >> /etc/openvpn/user/$company-up.sh
 cd $CAUSERPATH
 #ln -s /etc/openvpn/user/$company-user.ovpn /etc/openvpn/user/$company-user.conf
-ln -s $company-user.ovpn $company-user.conf .
+ln -s $company-user.ovpn $company-user.conf
 tar -cvf $company.tar *
 echo
 echo "Клиентские сертификаты и конфиги сгенерированы (8 файлов). Их нужно скопировать из /etc/openvpn/user на шлюз."

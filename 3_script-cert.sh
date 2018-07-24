@@ -24,6 +24,7 @@ vdsip=`ip addr show $net | awk '$1 == "inet" {gsub(/\/.*$/, "", $2); print $2}'`
 EASYRSAPATH=/etc/openvpn/easy-rsa
 KEYSPATH=/etc/openvpn/easy-rsa/keys
 CAUSERPATH=/etc/openvpn/user/
+#Генерируем сертификаты
 cd $EASYRSAPATH
 source vars
 ./clean-all
@@ -62,7 +63,7 @@ cp *user.crt *user.key *ca.crt *ta.key /etc/openvpn/user
 # ****Генерация /ccd и server.conf********************************
 mkdir /etc/openvpn/ccd
 touch /etc/openvpn/ccd/$company-user
-#указываем СВОИ подсети (строка 63, 66)
+#указываем СВОИ подсети (строка 67, 70)
 echo -en "ifconfig-push 10.1.$tun.4 10.1.$tun.1\niroute 10.1.1.0 255.255.255.0\niroute 192.168.102.0 255.255.255.0\niroute 192.168.10.0 255.255.255.0\niroute 192.168.2.0 255.255.255.0\n" >> /etc/openvpn/ccd/$company-user
 touch /etc/openvpn/server.conf
 echo -en "port 1194\nproto tcp\ndev tun0\nca $company-ca.crt\ncert $company-server.crt\nkey $company-server.key\ndh dh2048.pem\nserver 10.1.$tun.0 255.255.255.0\nclient-config-dir ccd\n" >> /etc/openvpn/server.conf

@@ -35,22 +35,22 @@ echo
 echo -en "\n\n\n\n\n\n\n\n" | ./build-ca
 printf "\033c"
 echo
-echo "1. Генерация корневого сертификата. Ok."
+echo "1. Генерация корневого сертификата. \033[32;1mOk\033[0m"
 echo "2. Генерация серверного сертификата..."
 echo
 (echo -en "\n\n\n\n\n\n\n\n"; sleep 1; echo -en "\n"; sleep 1; echo -en "\n"; sleep 3; echo -en "y"; echo -en "\n"; sleep 3; echo -en "y"; echo -en "\n") | ./build-key-server $company-server
 printf "\033c"
 echo
-echo "1. Генерация корневого сертификата. Ok"
-echo "2. Генерация серверного сертификата. Ok"
+echo "1. Генерация корневого сертификата. \033[32;1mOk\033[0m"
+echo "2. Генерация серверного сертификата. \033[32;1mOk\033[0m"
 echo "3. Генерация клиентского сертификата..."
 echo
 (echo -en "\n\n\n\n\n\n\n\n"; sleep 1; echo -en "\n"; sleep 1; echo -en "\n"; sleep 3; echo -en "y"; echo -en "\n"; sleep 3; echo -en "y"; echo -en "\n") | ./build-key $company-user
 printf "\033c"
 echo
-echo "1. Генерация корневого сертификата. Ok"
-echo "2. Генерация серверного сертификата. Ok"
-echo "3. Генерация клиентского сертификата. Ok"
+echo "1. Генерация корневого сертификата. \033[32;1mOk\033[0m"
+echo "2. Генерация серверного сертификата. \033[32;1mOk\033[0m"
+echo "3. Генерация клиентского сертификата. \033[32;1mOk\033[0m"
 echo "4. Генерация ключа Диффи-Хэлмана и ключа для TLS-аутентификации..."
 echo
 ./build-dh
@@ -107,5 +107,5 @@ echo
 echo "Клиентские сертификаты и конфиги сгенерированы (8 файлов). Их нужно скопировать из /etc/openvpn/user на шлюз."
 # ****************************************************************
 echo
-echo "***** Script 3/3 COMPLETED in $SECONDS seconds *****"
+echo "***** Script \033[33;1m 3\033[0m of \033[33;1m 3\033[0m COMPLETED in $SECONDS seconds *****"
 echo

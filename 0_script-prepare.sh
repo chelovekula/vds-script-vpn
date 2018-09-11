@@ -25,5 +25,5 @@ wget https://raw.githubusercontent.com/Krushon/vds-script/master/3_script-cert.s
 wget https://raw.githubusercontent.com/Krushon/vds-script/master/script-delete.sh
 chmod +x 1_script-upgrade.sh 2_script-install.sh 3_script-cert.sh script-delete.sh
 echo
-echo "***** Script COMPLETED in $SECONDS seconds *****"
+echo "***** Script \033[33;1m 0\033[0m of \033[33;1m 3\033[0m COMPLETED in $SECONDS seconds *****"
 echo

@@ -25,5 +25,5 @@ elif [ $ver = 'VERSION_ID="9"' ]
     exit 0
 fi
 echo
-echo "***** Script \033[33;1m 1\033[0m of \033[33;1m 3\033[0m COMPLETED in $SECONDS seconds *****"
+echo -e "***** Script \033[33;1m1\033[0m of \033[33;1m3\033[0m COMPLETED in $SECONDS seconds *****"
 echo

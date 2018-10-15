@@ -19,5 +19,5 @@ ln -s /etc/openvpn/easy-rsa/openssl-1.0.0.cnf /etc/openvpn/easy-rsa/openssl.cnf
 # Разрешаем форвардить пакеты из одной сети в другую.
 sed -i '28s/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
 echo
-echo "***** Script \033[33;1m 2\033[0m of \033[33;1m 3\033[0m COMPLETED in $SECONDS seconds *****"
+echo -e "***** Script \033[33;1m2\033[0m of \033[33;1m3\033[0m COMPLETED in $SECONDS seconds *****"
 echo

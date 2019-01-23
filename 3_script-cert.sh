@@ -64,11 +64,11 @@ cp *user.crt *user.key *ca.crt *ta.key /etc/openvpn/user
 mkdir /etc/openvpn/ccd
 touch /etc/openvpn/ccd/$company-user
 #указываем СВОИ подсети (строка 67, 70)
-echo -en "ifconfig-push 10.1.$tun.4 10.1.$tun.1\niroute 10.1.1.0 255.255.255.0\niroute 192.168.102.0 255.255.255.0\niroute 192.168.10.0 255.255.255.0\niroute 192.168.2.0 255.255.255.0\n" >> /etc/openvpn/ccd/$company-user
+echo -en "ifconfig-push 10.1.$tun.4 10.1.$tun.1\niroute 10.1.1.0 255.255.255.0\niroute 192.168.102.0 255.255.255.0\n#iroute 192.168.10.0 255.255.255.0\n#iroute 192.168.2.0 255.255.255.0\n" >> /etc/openvpn/ccd/$company-user
 touch /etc/openvpn/server.conf
 echo -en "port 1194\nproto tcp\ndev tun0\nca $company-ca.crt\ncert $company-server.crt\nkey $company-server.key\ndh dh2048.pem\nserver 10.1.$tun.0 255.255.255.0\nclient-config-dir ccd\n" >> /etc/openvpn/server.conf
 echo -en "route 10.1.1.0 255.255.255.0\nroute 10.1.$tun.0 255.255.255.0\nroute 192.168.102.0 255.255.255.0 10.1.$tun.2\n#route 192.168.10.0 255.255.255.0 10.1.$tun.2\n#route 192.168.2.0 255.255.255.0 10.1.$tun.2\n" >> /etc/openvpn/server.conf
-echo -en "push \042redirect-gateway def1\042\nkeepalive 10 120\ntls-auth $company-ta.key 0\ncipher DES-EDE3-CBC\ncomp-lzo\npersist-key\npersist-tun\nstatus openvpn-status.log\nlog /var/log/openvpn.log\nverb 3\n" >> /etc/openvpn/server.conf
+echo -en "#push \042redirect-gateway def1\042\nkeepalive 10 120\ntls-auth $company-ta.key 0\ncipher DES-EDE3-CBC\ncomp-lzo\npersist-key\npersist-tun\nstatus openvpn-status.log\nlog /var/log/openvpn.log\nverb 3\n" >> /etc/openvpn/server.conf
 # ****************************************************************
 # ****Генерация rc.local и iptables.rules ************************
 rm /etc/rc.local
@@ -84,8 +84,8 @@ echo -en "-A INPUT -s 185.45.152.174/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A
 echo -en "-A INPUT -s 5.9.108.25/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 89.249.23.194/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 195.122.19.17/32 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules
 echo -en "-A INPUT -s 195.122.19.18/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 195.122.19.19/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 195.122.19.9/32 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules
 echo -en "-A INPUT -s 195.122.19.10/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 195.122.19.11/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 91.228.238.172/32 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules
-echo -en "-A INPUT -s 185.45.152.128/28 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 185.45.152.160/27 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 192.168.10.0/24 -p udp -m udp --dport 4569 -j ACCEPT\n" >> /etc/iptables.rules
-echo -en "-A INPUT -s 192.168.2.0/24 -p udp -m udp --dport 4569 -j ACCEPT\n-A INPUT -p udp -m udp --dport 10000:20000 -j ACCEPT\n-A INPUT -p icmp -m icmp --icmp-type 0 -j ACCEPT\n-A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "-A INPUT -s 185.45.152.128/28 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 185.45.152.160/27 -p udp -m udp --dport 5060 -j ACCEPT\n#-A INPUT -s 192.168.10.0/24 -p udp -m udp --dport 4569 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "#-A INPUT -s 192.168.2.0/24 -p udp -m udp --dport 4569 -j ACCEPT\n-A INPUT -p udp -m udp --dport 10000:20000 -j ACCEPT\n-A INPUT -p icmp -m icmp --icmp-type 0 -j ACCEPT\n-A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT\n" >> /etc/iptables.rules
 echo -en "COMMIT\n##############\n*nat\n:PREROUTING ACCEPT [8279:852947]\n:OUTPUT ACCEPT [0:0]\n:POSTROUTING ACCEPT [0:0]\n" >> /etc/iptables.rules
 echo -en "-A POSTROUTING -o $net -j SNAT --to-source $vdsip\nCOMMIT\n*raw\n:PREROUTING ACCEPT [44288:4119009]\n:OUTPUT ACCEPT [222:25744]\nCOMMIT\n" >> /etc/iptables.rules
 # ****************************************************************

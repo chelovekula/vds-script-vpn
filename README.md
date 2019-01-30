@@ -1,4 +1,4 @@
-# vds-script
+# vds-script-vpn
 (bash scripts)<br>
 <br>
 **Описание скриптов:**<br>

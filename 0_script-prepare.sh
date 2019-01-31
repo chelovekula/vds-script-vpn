@@ -19,10 +19,10 @@ echo -en "X11Forwarding yes\nX11DisplayOffset 10\nPrintMotd no\nPrintLastLog yes
 echo -en "Subsystem sftp /usr/lib/openssh/sftp-server\nUsePAM yes\n" >> /etc/ssh/sshd_config
 chmod 644 /etc/ssh/sshd_config
 ###
-wget https://raw.githubusercontent.com/Krushon/vds-script/master/1_script-upgrade.sh
-wget https://raw.githubusercontent.com/Krushon/vds-script/master/2_script-install.sh
-wget https://raw.githubusercontent.com/Krushon/vds-script/master/3_script-cert.sh
-wget https://raw.githubusercontent.com/Krushon/vds-script/master/script-delete.sh
+wget https://raw.githubusercontent.com/Krushon/vds-script-vpn/master/1_script-upgrade.sh
+wget https://raw.githubusercontent.com/Krushon/vds-script-vpn/master/2_script-install.sh
+wget https://raw.githubusercontent.com/Krushon/vds-script-vpn/master/3_script-cert.sh
+wget https://raw.githubusercontent.com/Krushon/vds-script-vpn/master/script-delete.sh
 chmod +x 1_script-upgrade.sh 2_script-install.sh 3_script-cert.sh script-delete.sh
 echo
 echo -e "***** Script \033[33;1m0\033[0m of \033[33;1m3\033[0m COMPLETED in $SECONDS seconds *****"

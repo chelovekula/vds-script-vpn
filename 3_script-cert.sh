@@ -10,6 +10,9 @@ echo "Enter the \"email\" "
 read email
 echo "Enter the \"tun\" "
 read tun
+echo "Enter the \"ssh\" port"
+read ssh
+sed -i '1s/Port 22/Port $ssh/' /etc/ssh/sshd_config
 sed -i '64s/US/RU/' /etc/openvpn/easy-rsa/vars
 sed -i '65s/CA/MSK/' /etc/openvpn/easy-rsa/vars
 sed -i '66s/SanFrancisco/Moscow/' /etc/openvpn/easy-rsa/vars
@@ -78,7 +81,7 @@ echo -en "#!/bin/sh -e\niptables-restore < /etc/iptables.rules\nexit 0\n" >> /et
 touch /etc/iptables.rules
 echo -en "*mangle\n:PREROUTING ACCEPT [44213:4111894]\n:INPUT ACCEPT [22109:2121408]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [222:25744]\n:POSTROUTING ACCEPT [222:25744]\nCOMMIT\n" >> /etc/iptables.rules
 echo -en "*filter\n:INPUT DROP [21121:2005015]\n:FORWARD ACCEPT [0:0]\n:OUTPUT ACCEPT [222:25744]\n" >> /etc/iptables.rules
-echo -en "-A INPUT -i tun0 -j ACCEPT\n-A INPUT -i lo -j ACCEPT\n-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT\n" >> /etc/iptables.rules
+echo -en "-A INPUT -i tun0 -j ACCEPT\n-A INPUT -i lo -j ACCEPT\n-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n-A INPUT -p tcp -m tcp --dport $ssh -j ACCEPT\n" >> /etc/iptables.rules
 echo -en "-A INPUT -p tcp -m tcp --dport 1194 -j ACCEPT\n" >> /etc/iptables.rules
 echo -en "-A INPUT -s 185.45.152.174/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 178.16.26.122/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 176.9.145.115/32 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules
 echo -en "-A INPUT -s 5.9.108.25/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 89.249.23.194/32 -p udp -m udp --dport 5060 -j ACCEPT\n-A INPUT -s 195.122.19.17/32 -p udp -m udp --dport 5060 -j ACCEPT\n" >> /etc/iptables.rules

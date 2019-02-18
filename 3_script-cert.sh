@@ -12,7 +12,7 @@ echo "Enter the \"tun\" "
 read tun
 echo "Enter the \"ssh\" port"
 read ssh
-sed -i '1s/Port 22/Port $ssh/' /etc/ssh/sshd_config
+sed -i "1s/22/${ssh}/" /etc/ssh/sshd_config
 sed -i '64s/US/RU/' /etc/openvpn/easy-rsa/vars
 sed -i '65s/CA/MSK/' /etc/openvpn/easy-rsa/vars
 sed -i '66s/SanFrancisco/Moscow/' /etc/openvpn/easy-rsa/vars
@@ -96,8 +96,8 @@ echo -en "-A POSTROUTING -o $net -j SNAT --to-source $vdsip\nCOMMIT\n*raw\n:PRER
 touch /etc/openvpn/user/$company-openvpn.log #должен быть пустой
 touch /etc/openvpn/user/$company-user.ovpn
 echo -en "client\ndev tun$tun\nproto tcp\nremote $vdsip 1194\nresolv-retry infinite\nnobind\npersist-key\npersist-tun\n" >> /etc/openvpn/user/$company-user.ovpn
-echo -en "ca $company-ca.crt\ncert $company-user.crt\nkey $company-user.key\ntls-auth $company-ta.key 1\ncipher DES-EDE3-CBC\n" >> /etc/openvpn/user/$company-user.ovpn
-echo -en "ns-cert-type server\ncomp-lzo\nlog $company-openvpn.log\nverb 3\nscript-security 2\nup \042/etc/openvpn/$company-up.sh\042\n" >> /etc/openvpn/user/$company-user.ovpn
+echo -en "ca /etc/openvpn/$company/$company-ca.crt\ncert /etc/openvpn/$company/$company-user.crt\nkey /etc/openvpn/$company/$company-user.key\ntls-auth /etc/openvpn/$company/$company-ta.key 1\ncipher DES-EDE3-CBC\n" >> /etc/openvpn/user/$company-user.ovpn
+echo -en "ns-cert-type server\ncomp-lzo\nlog /etc/openvpn/$company/$company-openvpn.log\nverb 3\nscript-security 2\nup \042/etc/openvpn/$company/$company-up.sh\042\n" >> /etc/openvpn/user/$company-user.ovpn
 touch /etc/openvpn/user/$company-up.sh
 echo -en "#!/bin/bash\n/sbin/ip route add default via 10.1.$tun.1 dev tun$tun table $company\n" >> /etc/openvpn/user/$company-up.sh
 echo -en "#/sbin/ip rule add from 10.1.1.x table $company #KB\n#/sbin/ip rule add from 192.168.x.x table $company #TXM\n" >> /etc/openvpn/user/$company-up.sh
@@ -106,7 +106,7 @@ cd $CAUSERPATH
 ln -s $company-user.ovpn $company-user.conf
 tar -cvf $company.tar *
 echo
-echo "Клиентские сертификаты и конфиги сгенерированы (8 файлов). Их нужно скопировать из /etc/openvpn/user на шлюз."
+echo "Клиентские сертификаты и конфиги сгенерированы (8 файлов) и упакованы в архив /etc/openvpn/user/$company.tar. Его нужно скопировать на шлюз."
 # ****************************************************************
 echo
 echo -e "***** Script \033[33;1m3\033[0m of \033[33;1m3\033[0m COMPLETED in $SECONDS seconds *****"

@@ -80,4 +80,4 @@ tar -xvf ~/"$1"/"$1".tar -C ~/"$1"
 chmod 766 ~/"$1"/"$1"-up.sh
 ```
 Скрипт при вызове "./copy-vds-ca.sh company1" создаст папку, скопирует и распакует архив с сертификатами.
-Далее эти сертификаты копируем в папку /etc/openvpn/company1, файл @company1.conf переновим в /etc/openvpn.
+Далее эти сертификаты копируем в папку /etc/openvpn/company1, файл @company1-user.conf переносим в /etc/openvpn.

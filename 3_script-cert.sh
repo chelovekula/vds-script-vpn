@@ -92,6 +92,16 @@ echo -en "-A INPUT -p udp -m udp --dport 10000:20000 -j ACCEPT\n-A INPUT -p icmp
 echo -en "COMMIT\n##############\n*nat\n:PREROUTING ACCEPT [8279:852947]\n:OUTPUT ACCEPT [0:0]\n:POSTROUTING ACCEPT [0:0]\n" >> /etc/iptables.rules
 echo -en "-A POSTROUTING -o $net -j SNAT --to-source $vdsip\nCOMMIT\n*raw\n:PREROUTING ACCEPT [44288:4119009]\n:OUTPUT ACCEPT [222:25744]\nCOMMIT\n" >> /etc/iptables.rules
 # ****************************************************************
+#настройка fail2ban
+touch /etc/fail2ban/jail.local
+echo -en "[sshd]\nenabled   = true\nfilter    = sshd\nbanaction = iptables-multiport\n" >> /etc/fail2ban/jail.local
+echo -en "findtime  = 3600\nmaxretry  = 3\nbantime   = 259200\n\n" >> /etc/fail2ban/jail.local
+echo -en "[sshd-ddos]\nenabled   = true\nport      = ssh,sftp\n" >> /etc/fail2ban/jail.local
+echo -en "filter    = sshd-ddos\nmaxretry  = 2\n\n" >> /etc/fail2ban/jail.local
+echo -en "[asterisk]\nenabled   = true\nfilter    = asterisk\n" >> /etc/fail2ban/jail.local
+echo -en "action    = iptables-allports[name=asterisk, protocol=all]\n" >> /etc/fail2ban/jail.local
+echo -en "logpath   = /var/log/asterisk/messages\nbantime   = 259200\n" >> /etc/fail2ban/jail.local
+/etc/init.d/fail2ban restart
 # ****Генерация клиентских конфигов ******************************
 touch /etc/openvpn/user/$company-openvpn.log #должен быть пустой
 touch /etc/openvpn/user/$company-user.ovpn

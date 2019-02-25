@@ -4,7 +4,7 @@ SECONDS=0
 printf "\033c"
 echo "Устанавливаем необходимое ПО..."
 apt-get update
-apt-get install openvpn asterisk mc ntpdate net-tools ntp -y
+apt-get install openvpn asterisk mc ntp ntpdate net-tools fail2ban -y
 apt-get autoclean && apt-get clean
 /etc/init.d/ntp stop && ntpdate pool.ntp.org && /etc/init.d/ntp start
 # Изменяем временную зону

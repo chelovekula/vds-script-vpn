@@ -19,7 +19,7 @@ echo -en "PubkeyAuthentication yes\nAuthorizedKeysFile %h/.ssh/authorized_keys\n
 echo -en "IgnoreRhosts yes\nPermitEmptyPasswords no\nHostbasedAuthentication no\n" >> /etc/ssh/sshd_config
 echo -en "ChallengeResponseAuthentication no\nKerberosAuthentication no\n" >> /etc/ssh/sshd_config
 echo -en "GSSAPIAuthentication no\nGSSAPICleanupCredentials yes\nUsePAM yes\n" >> /etc/ssh/sshd_config
-echo -en "X11DisplayOffset 10\nX11Forwarding yes\nX11UseLocalhost	no\nTCPKeepAlive yes\n" >> /etc/ssh/sshd_config
+echo -en "X11DisplayOffset 10\nX11Forwarding yes\nX11UseLocalhost no\nTCPKeepAlive yes\n" >> /etc/ssh/sshd_config
 echo -en "UsePrivilegeSeparation yes\nPermitUserEnvironment no\nClientAliveCountMax 0\n" >> /etc/ssh/sshd_config
 echo -en "UseDNS no\nMaxStartups 10:50:30\n" >> /etc/ssh/sshd_config
 echo -en "AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES\n" >> /etc/ssh/sshd_config

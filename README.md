@@ -41,20 +41,18 @@ script-delete - Удаление ПО и сертификатов.<br>
 
 2. Подключаемся к vds по ssh, устанавливаем права на запуск скрипта, запускаем скрипт.
 
-`ssh root@айпи`
-`chmod +x 0_script-prepare.sh`
-`./0_script-prepare.sh`
+`ssh root@айпи`<br>
+`chmod +x 0_script-prepare.sh`<br>
+`./0_script-prepare.sh`<br>
 
 Обновится файл sshd_config для подключения к vds по ssh с ключом. Скачаются скрипты установки ПО и генерации сертификатов с github.
 
-Можно перезагрузиться.
-
 3. Подлючаемся обратно и запускаем скрипты по очереди.
 
-`ssh root@айпи -i ключ.key`
-`./1_script-upgrade.sh`
-`./2_script-install.sh`
-`./3_script-cert.sh`
+`ssh root@айпи -i ключ.key`<br>
+`./1_script-upgrade.sh`<br>
+`./2_script-install.sh`<br>
+`./3_script-cert.sh`<br>
 
 Вся система будет обновлена, установится ПО, сгенерируются сертификаты.<br>
 *При генерации сертификатов необходимо будет указать название компании, емэйл и номер туннеля*<br>

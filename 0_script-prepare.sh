@@ -2,11 +2,13 @@
 # Подготавливаем vds-машину для работы.
 SECONDS=0
 printf "\033c"
-### Копирование ssh-ключа. Проверить потом, где лежит ключ. На всякий.
+### Копирование ssh-ключа.
 mkdir /root/.ssh
 mv /root/authorized_keys /root/.ssh
 chmod 700 /root/.ssh
 chmod 600 /root/.ssh/authorized_keys
+mv /etc/motd /etc/motd.bak
+touch /etc/motd && chmod 664 /etc/motd
 # Генерация файла sshd_config для доступа по ssh-ключу
 mv /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 touch /etc/ssh/sshd_config

@@ -36,12 +36,12 @@ script-delete - Удаление ПО и сертификатов.<br>
 `fail2ban` - отслеживает файлы журнала и временно или постоянно запрещает доступ нарушителям<br>
 <br>
 **Работа со скриптами:**
-1. На vds загружаем скрипт 0_script-prepare.sh и ключ authorized_keys через терминал.
+1. На vds загружаем скрипт 0_script-prepare.sh и ключ authorized_keys через терминал.<br>
 `$ scp 0_script-prepare.sh authorized_keys root@айпи:~`
 
 ИЛИ
 
-скачиваем `0_script-prepare.sh` напрямую из репозитория:
+скачиваем `0_script-prepare.sh` напрямую из репозитория:<br>
 `# wget https://raw.githubusercontent.com/Krushon/vds-script-vpn/master/0_script-prepare.sh`
 
 2. Подключаемся к vds по ssh, устанавливаем права на запуск скрипта, запускаем скрипт.

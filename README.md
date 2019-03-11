@@ -37,7 +37,7 @@ script-delete - Удаление ПО и сертификатов.<br>
 <br>
 **Работа со скриптами:**
 1. На vds загружаем скрипт 0_script-prepare.sh и ключ authorized_keys через терминал.
-`$ scp 0_script-prepare.sh authorized_keys root@айпи:~``
+`$ scp 0_script-prepare.sh authorized_keys root@айпи:~`
 
 ИЛИ
 

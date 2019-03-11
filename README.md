@@ -39,6 +39,11 @@ script-delete - Удаление ПО и сертификатов.<br>
 1. На vds загружаем скрипт 0_script-prepare.sh и ключ authorized_keys через терминал.
 `$ scp 0_script-prepare.sh authorized_keys root@айпи:~``
 
+ИЛИ
+
+скачиваем `0_script-prepare.sh` напрямую из репозитория:
+`# wget https://raw.githubusercontent.com/Krushon/vds-script-vpn/master/0_script-prepare.sh`
+
 2. Подключаемся к vds по ssh, устанавливаем права на запуск скрипта, запускаем скрипт.
 
 `ssh root@айпи`<br>
